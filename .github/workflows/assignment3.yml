@@ -70,17 +70,26 @@ jobs:
         uses: actions/download-artifact@v4
 
       - name: Stop and remove any existing containers
-        run: docker-compose down
-
-      - name: Start containers
         run: |
-          docker-compose up -d \
-          && echo "Container up and running" >> log.txt \
-          || (echo "Container failed to run" >> log.txt && exit 1)
-        continue-on-error: true
+          docker-compose down --volumes
+          docker-compose rm -f
+
+      - name: Run Docker Compose
+        run: docker-compose up -d
 
       - name: Wait for MongoDB to be ready
-        run: sleep 30
+        run: |
+          for i in `seq 1 30`; do
+            nc -z localhost 27017 && echo "MongoDB is up" && break || echo "Waiting for MongoDB..." && sleep 1;
+          done
+
+      # - name: Start containers
+      #   run: |
+      #     docker-compose up -d \
+      #     && echo "Container up and running" >> log.txt \
+      #     || (echo "Container failed to run" >> log.txt && exit 1)
+      #   continue-on-error: true
+
 
       - name: Run tests
         env:
