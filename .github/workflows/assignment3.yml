@@ -42,7 +42,7 @@ jobs:
         if: always()
         uses: actions/upload-artifact@v4
         with:
-          name: log
+          name: build-log
           path: log.txt
 
   test:
@@ -51,7 +51,6 @@ jobs:
     services:
       mongo:
         image: mongo:latest
-        # options: --health-cmd "mongo --eval 'db.runCommand(\"ping\").ok'" --health-interval 10s --health-timeout 5s --health-retries 3
         ports:
           - 27017:27017
 
@@ -70,7 +69,7 @@ jobs:
       - name: Download log from build job
         uses: actions/download-artifact@v2
         with:
-          name: log
+          name: build-log
           path: .
 
       - name: Start containers
@@ -107,7 +106,7 @@ jobs:
         if: always() 
         uses: actions/upload-artifact@v4
         with:
-          name: log
+          name: test-log
           path: log.txt
 
   query:
@@ -116,7 +115,6 @@ jobs:
     services:
       mongo:
         image: mongo:latest
-        # options: --health-cmd "mongo --eval 'db.runCommand(\"ping\").ok'" --health-interval 10s --health-timeout 5s --health-retries 3
         ports:
           - 27017:27017
 
@@ -131,12 +129,6 @@ jobs:
 
       - name: Install dependencies
         run: pip install requests pymongo
-
-      - name: Download log from test job
-        uses: actions/download-artifact@v2
-        with:
-          name: log
-          path: .
 
       - name: Start containers
         run: docker-compose up -d
