@@ -23,7 +23,7 @@ jobs:
 
       - name: Create log file
         run: |
-          echo "${{ env.DATE }}" > log.txt
+          echo "${{ env.DATE }}" >> log.txt
           echo "your-username" >> log.txt
 
       - name: Build Docker image
