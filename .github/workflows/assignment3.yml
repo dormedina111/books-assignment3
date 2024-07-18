@@ -24,21 +24,21 @@ jobs:
       - name: Create log file
         run: |
           echo "${{ env.DATE }}" > log.txt
-          echo "${{ github.actor }}" >> log.txt
+          echo "your-username" >> log.txt
 
       - name: Build Docker image
         run: docker build . --file books/Dockerfile --tag ${{ secrets.DOCKER_USERNAME }}/books-service:latest
         continue-on-error: true
 
-      - name: Log build result
+      - name: Log build result success
         run: echo "image successfully built" >> log.txt
         if: success()
 
-      - name: Log build failure
+      - name: Log build result failure
         run: echo "image not able to be built" >> log.txt
         if: failure()
 
-      - name: Upload log on build completion
+      - name: Upload log after build
         uses: actions/upload-artifact@v4
         with:
           name: log
@@ -50,7 +50,7 @@ jobs:
     services:
       mongo:
         image: mongo:latest
-        options: --health-cmd "mongo --eval 'db.runCommand(\"ping\").ok'" --health-interval 10s --health-timeout 5s --health-retries 3
+        # options: --health-cmd "mongo --eval 'db.runCommand(\"ping\").ok'" --health-interval 10s --health-timeout 5s --health-retries 3
         ports:
           - 27017:27017
 
@@ -73,36 +73,26 @@ jobs:
           path: .
 
       - name: Start containers
-        run: docker-compose up -d
+        run: |
+          docker-compose up -d \
+          && echo "Container up and running" >> log.txt \
+          || (echo "Container failed to run" >> log.txt && exit 1)
         continue-on-error: true
 
-      - name: Log container start result
-        run: echo "Container up and running" >> log.txt
-        if: success()
-
-      - name: Log container start failure
-        run: echo "Container failed to run" >> log.txt
-        if: failure()
-
-      - name: Upload log on container failure
-        if: failure()
-        uses: actions/upload-artifact@v4
-        with:
-          name: log
-          path: log.txt
+      - name: Wait for MongoDB to be ready
+        run: sleep 30
 
       - name: Run tests
         env:
           MONGO_URL: mongodb://mongo:27017/library
-        run: |
-          pytest -v tests/assn3_tests.py | tee assn3_test_results.txt
+        run: pytest -v tests/assn3_tests.py | tee assn3_test_results.txt
         continue-on-error: true
 
-      - name: Log test result
+      - name: Log test result success
         run: echo "tests succeeded" >> log.txt
         if: success()
 
-      - name: Log test failure
+      - name: Log test result failure
         run: echo "tests failed" >> log.txt
         if: failure()
 
@@ -112,7 +102,7 @@ jobs:
           name: test-results
           path: assn3_test_results.txt
 
-      - name: Upload log
+      - name: Upload log after tests
         uses: actions/upload-artifact@v4
         with:
           name: log
@@ -124,7 +114,7 @@ jobs:
     services:
       mongo:
         image: mongo:latest
-        options: --health-cmd "mongo --eval 'db.runCommand(\"ping\").ok'" --health-interval 10s --health-timeout 5s --health-retries 3
+        # options: --health-cmd "mongo --eval 'db.runCommand(\"ping\").ok'" --health-interval 10s --health-timeout 5s --health-retries 3
         ports:
           - 27017:27017
 
@@ -139,6 +129,12 @@ jobs:
 
       - name: Install dependencies
         run: pip install requests pymongo
+
+      - name: Download log from test job
+        uses: actions/download-artifact@v2
+        with:
+          name: log
+          path: .
 
       - name: Start containers
         run: docker-compose up -d
