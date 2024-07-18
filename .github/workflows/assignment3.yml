@@ -44,6 +44,7 @@ jobs:
         with:
           name: log-build
           path: log.txt
+          overwrite: true
 
   test:
     needs: build
@@ -105,6 +106,7 @@ jobs:
         with:
           name: log-test
           path: log.txt
+          overwrite: true
 
   query:
     needs: test
@@ -159,7 +161,6 @@ jobs:
               echo "response: error $HTTP_CODE" >> response.txt
             fi
           done < query.txt
-        continue-on-error: true
 
       - name: Upload response
         if: always()
