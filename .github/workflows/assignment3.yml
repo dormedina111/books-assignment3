@@ -105,7 +105,6 @@ jobs:
         with:
           name: log
           path: log.txt
-          overwrite: true
 
   query:
     needs: test
