@@ -38,8 +38,7 @@ jobs:
         run: echo "image not able to be built" >> log.txt
         if: failure()
 
-      - name: Upload log on build failure
-        if: failure()
+      - name: Upload log on build completion
         uses: actions/upload-artifact@v4
         with:
           name: log
@@ -66,6 +65,12 @@ jobs:
 
       - name: Install dependencies
         run: pip install pytest requests pymongo
+
+      - name: Download log from build job
+        uses: actions/download-artifact@v2
+        with:
+          name: log
+          path: .
 
       - name: Start containers
         run: docker-compose up -d
