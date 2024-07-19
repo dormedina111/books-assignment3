@@ -1,0 +1,3 @@
+?genre=Fiction
+?author=Isaac%20Asimov
+?publishedDate=2020
