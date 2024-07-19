@@ -61,7 +61,7 @@ jobs:
       mongo:
         image: mongo
         ports:
-          - 27017:27017
+          - 24876:27017
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
@@ -100,7 +100,7 @@ jobs:
       mongo:
         image: mongo
         ports:
-          - 27017:27017
+          - 24876:27017
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
