@@ -23,7 +23,10 @@ jobs:
           docker build -t books-service ./books && echo "image successfully built" >> log.txt || echo "image not able to be built" >> log.txt
 
       - name: Save built image
-        run: docker save books-service | gzip > books-service.tar.gz
+        run: docker save -o books-service.tar books-service
+      
+      - name: Compress the image
+        run: gzip books-service.tar
 
       - name: Upload built image
         uses: actions/upload-artifact@v4
@@ -36,7 +39,6 @@ jobs:
         with:
           name: log
           path: log.txt
-          overwrite: true
 
   test:
     needs: build
@@ -67,7 +69,7 @@ jobs:
 
       - name: Start services
         run: |
-          cat log.txt < log.txt
+          cat log.txt > log.txt
           docker-compose up -d && echo "Container up and running" >> log.txt || echo "Container failed to run" >> log.txt
 
       - name: Run tests
@@ -108,12 +110,6 @@ jobs:
       - name: Load Docker image
         run: gunzip -c books-service.tar.gz | docker load
 
-      - name: Download log
-        uses: actions/download-artifact@v4
-        with:
-          name: log
-          path: log.txt
-
       - name: Start services
         run: docker-compose up -d
 
@@ -136,13 +132,3 @@ jobs:
         with:
           name: query-results
           path: response.txt
-
-      - name: Final log update
-        run: echo "Query job completed" >> log.txt
-
-      - name: Upload final log
-        uses: actions/upload-artifact@v4
-        with:
-          name: log
-          path: log.txt
-          overwrite: true
