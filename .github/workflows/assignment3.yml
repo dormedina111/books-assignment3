@@ -113,12 +113,14 @@ jobs:
           fi
 
       - name: Upload test results
+        if: always()    
         uses: actions/upload-artifact@v4
         with:
           name: test-results
           path: assn3_test_results.txt
 
       - name: Upload updated build log
+        if: always()    
         uses: actions/upload-artifact@v4
         with:
           name: log
@@ -144,11 +146,11 @@ jobs:
           path: /tmp/books-service.tar
 
       - name: Load Docker image
-        run: docker load -i /tmp/books-service.tar
+        run: docker load --input books-service/tmp/books-service.tar
 
       - name: Start services and run queries
         run: |
-          docker-compose up -d && echo "Container up and running" >> log.txt || echo "Container failed to run" >> log.txt
+          docker-compose up -d 
           curl -X POST http://localhost:5001/books -H "Content-Type: application/json" -d '{"title":"Adventures of Huckleberry Finn","ISBN":"9780520343641","genre":"Fiction"}'
           curl -X POST http://localhost:5001/books -H "Content-Type: application/json" -d '{"title":"The Best of Isaac Asimov","ISBN":"9780385050784","genre":"Science Fiction"}'
           curl -X POST http://localhost:5001/books -H "Content-Type: application/json" -d '{"title":"Fear No Evil","ISBN":"9780394558783","genre":"Biography"}'
