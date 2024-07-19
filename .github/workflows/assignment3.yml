@@ -89,10 +89,17 @@ jobs:
       - name: Append to build log
         run: cat log.txt > log.txt
 
-      - name: Start services and run tests
+      - name: Start services 
         run: |
           docker-compose up -d && echo "Container up and running" >> log.txt || echo "Container failed to run" >> log.txt
-          docker-compose exec books-service pytest -v /tests/assn3_tests.py | tee assn3_test_results.txt && echo "tests succeeded" >> log.txt || echo "tests failed" >> log.txt
+
+      - name: List running containers
+        run: docker ps
+
+      - name: Run tests
+        run: |
+          docker-compose exec books pytest -v /tests/assn3_tests.py | tee assn3_test_results.txt
+          cat assn3_test_results.txt
 
       - name: Upload test results
         uses: actions/upload-artifact@v4
