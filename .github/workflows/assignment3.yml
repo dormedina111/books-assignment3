@@ -143,10 +143,10 @@ jobs:
         uses: actions/download-artifact@v4
         with:
           name: books-service
-          path: /tmp/books-service.tar
+          path: /tmp
 
       - name: Load Docker image
-        run: docker load --input tmp/books-service.tar
+        run: docker load --input /tmp/books-service.tar
 
       - name: Start services and run queries
         run: |
