@@ -1,120 +1,148 @@
 name: assignment3
 
-on: [push]
+on:
+  push:
+    branches:
+      - main
 
 jobs:
   build:
     runs-on: ubuntu-latest
     steps:
-      - name: Checkout repository
-        uses: actions/checkout@v2
+      - name: Checkout code
+        uses: actions/checkout@v4
 
       - name: Set up Docker Buildx
-        uses: docker/setup-buildx-action@v1
+        uses: docker/setup-buildx-action@v2
 
       - name: Build Docker image
-        run: docker build -t books-service ./books
+        run: |
+          start_time=$(date -Iminutes)
+          echo "Start Time: $start_time" > log.txt
+          echo "Dor Medina" >> log.txt
+          docker build -t books-service ./books && echo "image successfully built" >> log.txt || echo "image not able to be built" >> log.txt
 
-      - name: Log build status
-        run: echo "image successfully built" >> log.txt
+      - name: Save built image
+        run: docker save books-service | gzip > books-service.tar.gz
+
+      - name: Upload built image
+        uses: actions/upload-artifact@v4
+        with:
+          name: books-service
+          path: books-service.tar.gz
 
       - name: Upload log
-        uses: actions/upload-artifact@v2
+        uses: actions/upload-artifact@v4
         with:
           name: log
           path: log.txt
+          overwrite: true
 
   test:
     needs: build
     runs-on: ubuntu-latest
     services:
       mongo:
-        image: mongo:latest
+        image: mongo
         ports:
-          - 27018:27017
-
+          - 27017:27017
     steps:
-      - name: Checkout repository
-        uses: actions/checkout@v2
+      - name: Checkout code
+        uses: actions/checkout@v4
 
-      - name: Set up Docker Buildx
-        uses: docker/setup-buildx-action@v1
+      - name: Download built image
+        uses: actions/download-artifact@v4
+        with:
+          name: books-service
+          path: books-service.tar.gz
 
-      - name: Build Docker image
-        run: docker build -t books-service ./books
+      - name: Load Docker image
+        run: gunzip -c books-service.tar.gz | docker load
 
-      - name: Stop and remove any existing containers
+      - name: Download build log
+        uses: actions/download-artifact@v4
+        with:
+          name: log
+          path: log.txt
+
+      - name: Start services
         run: |
-          docker-compose down --volumes
-          docker-compose rm -f
+          cat log.txt < log.txt
+          docker-compose up -d && echo "Container up and running" >> log.txt || echo "Container failed to run" >> log.txt
 
-      - name: Run Docker Compose
-        run: docker-compose up -d
-
-      - name: Wait for MongoDB to be ready
+      - name: Run tests
         run: |
-          for i in `seq 1 30`; do
-            nc -z localhost 27017 && echo "MongoDB is up" && break || echo "Waiting for MongoDB..." && sleep 1;
-          done
-
-      - name: Run Pytest
-        run: |
-          pip install pytest requests
-          pytest -v tests/assn3_tests.py > assn3_test_results.txt
-
-      - name: Log test status
-        run: echo "tests succeeded" >> log.txt
+          docker-compose exec books-service pytest -v /app/tests/assn3_tests.py | tee assn3_test_results.txt && echo "tests succeeded" >> log.txt || echo "tests failed" >> log.txt
 
       - name: Upload test results
-        uses: actions/upload-artifact@v2
+        uses: actions/upload-artifact@v4
         with:
           name: test-results
           path: assn3_test_results.txt
 
       - name: Upload log
-        uses: actions/upload-artifact@v2
+        uses: actions/upload-artifact@v4
         with:
           name: log
           path: log.txt
+          overwrite: true
 
   query:
     needs: test
     runs-on: ubuntu-latest
+    services:
+      mongo:
+        image: mongo
+        ports:
+          - 27017:27017
     steps:
-      - name: Checkout repository
-        uses: actions/checkout@v2
+      - name: Checkout code
+        uses: actions/checkout@v4
 
-      - name: Set up Docker Buildx
-        uses: docker/setup-buildx-action@v1
+      - name: Download built image
+        uses: actions/download-artifact@v4
+        with:
+          name: books-service
+          path: books-service.tar.gz
 
-      - name: Build Docker image
-        run: docker build -t books-service ./books
+      - name: Load Docker image
+        run: gunzip -c books-service.tar.gz | docker load
 
-      - name: Stop and remove any existing containers
-        run: |
-          docker-compose down --volumes
-          docker-compose rm -f
+      - name: Download log
+        uses: actions/download-artifact@v4
+        with:
+          name: log
+          path: log.txt
 
-      - name: Run Docker Compose
+      - name: Start services
         run: docker-compose up -d
 
-      - name: Wait for MongoDB to be ready
+      - name: Run query job
         run: |
-          for i in `seq 1 30`; do
-            nc -z localhost 27017 && echo "MongoDB is up" && break || echo "Waiting for MongoDB..." && sleep 1;
-          done
-
-      - name: Run queries
-        run: |
-          touch response.txt
-          while IFS= read -r query
-          do
+          curl -X POST http://localhost:5001/books -H "Content-Type: application/json" -d '{"title":"Adventures of Huckleberry Finn","ISBN":"9780520343641","genre":"Fiction"}'
+          curl -X POST http://localhost:5001/books -H "Content-Type: application/json" -d '{"title":"The Best of Isaac Asimov","ISBN":"9780385050784","genre":"Science Fiction"}'
+          curl -X POST http://localhost:5001/books -H "Content-Type: application/json" -d '{"title":"Fear No Evil","ISBN":"9780394558783","genre":"Biography"}'
+          curl -X POST http://localhost:5001/books -H "Content-Type: application/json" -d '{"title":"The Adventures of Tom Sawyer","ISBN":"9780195810400","genre":"Fiction"}'
+          curl -X POST http://localhost:5001/books -H "Content-Type: application/json" -d '{"title":"I, Robot","ISBN":"9780553294385","genre":"Science Fiction"}'
+          curl -X POST http://localhost:5001/books -H "Content-Type: application/json" -d '{"title":"Second Foundation","ISBN":"9780553293364","genre":"Science Fiction"}'
+          queries=$(cat query.txt)
+          for query in $queries; do
+            response=$(curl -s -X GET "http://localhost:5001/books$query")
             echo "query: $query" >> response.txt
-            curl "http://localhost:5001/books$query" >> response.txt
-          done < query.txt
+            echo "response: $response" >> response.txt
 
-      - name: Upload response file
-        uses: actions/upload-artifact@v2
+      - name: Upload query results
+        uses: actions/upload-artifact@v4
         with:
-          name: response
+          name: query-results
           path: response.txt
+
+      - name: Final log update
+        run: echo "Query job completed" >> log.txt
+
+      - name: Upload final log
+        uses: actions/upload-artifact@v4
+        with:
+          name: log
+          path: log.txt
+          overwrite: true
