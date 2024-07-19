@@ -155,8 +155,14 @@ jobs:
       - name: Start services
         run: docker-compose up -d
 
-      - name: List running containers
-        run: docker ps
+      - name: Wait for Flask service to be ready
+        run: |
+          echo "Waiting for Flask service to be ready..."
+          while ! curl -s http://localhost:5001/health; do
+            sleep 5
+            echo "Waiting for Flask service..."
+          done
+          echo "Flask service is ready!"
 
       - name: Run queries
         run: |
