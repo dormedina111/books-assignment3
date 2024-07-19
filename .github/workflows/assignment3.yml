@@ -92,7 +92,7 @@ jobs:
       - name: Start services and run tests
         run: |
           docker-compose up -d && echo "Container up and running" >> log.txt || echo "Container failed to run" >> log.txt
-          docker-compose exec books-service pytest -v /app/tests/assn3_tests.py | tee assn3_test_results.txt && echo "tests succeeded" >> log.txt || echo "tests failed" >> log.txt
+          docker-compose exec books-service pytest -v /tests/assn3_tests.py | tee assn3_test_results.txt && echo "tests succeeded" >> log.txt || echo "tests failed" >> log.txt
 
       - name: Upload test results
         uses: actions/upload-artifact@v4
