@@ -5,7 +5,7 @@ services:
     image: mongo:latest
     restart: always
     ports:
-      - "24876:27017"
+      - "29478:27017"
     expose:
       - "27017"
 
