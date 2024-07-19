@@ -70,7 +70,7 @@ jobs:
         uses: actions/download-artifact@v4
 
       - name: Load Docker image
-        run: docker load --input /books-service.tar
+        run: docker load --input tmp/books-service.tar
 
       - name: Append to build log
         run: cat log.txt > log.txt
