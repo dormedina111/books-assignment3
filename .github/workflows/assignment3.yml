@@ -86,10 +86,10 @@ jobs:
           pip install pytest requests pymongo
       
       - name: Print log file contents
-        run: cat log.txt
+        run: cat log/log.txt
 
       - name: Append to build log
-        run: cat log.txt > log.txt
+        run: cat log/log.txt > log.txt
 
       - name: Start services 
         run: |
