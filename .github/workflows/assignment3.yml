@@ -102,6 +102,14 @@ jobs:
         run: pytest -v tests/assn3_tests.py | tee assn3_test_results.txt
         continue-on-error: true
 
+      - name: Log test results
+        run: |
+          if grep -q "FAILED" assn3_test_results.txt; then
+            echo "Tests failed" >> log.txt
+          else
+            echo "Tests succeeded" >> log.txt
+          fi
+
       - name: Upload test results
         uses: actions/upload-artifact@v4
         with:
