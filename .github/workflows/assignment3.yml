@@ -52,7 +52,6 @@ jobs:
         with:
           name: log
           path: log.txt
-          overwrite: true
           
   test:
     needs: build
@@ -85,11 +84,12 @@ jobs:
         run: |
           python -m pip install --upgrade pip
           pip install pytest requests pymongo
+      
+      - name: Print log file contents
+        run: cat log.txt
 
       - name: Append to build log
-        run: |
-          cat log.txt 
-          cat log.txt > log.txt
+        run: cat log.txt > log.txt
 
       - name: Start services 
         run: |
