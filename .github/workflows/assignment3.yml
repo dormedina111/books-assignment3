@@ -175,8 +175,8 @@ jobs:
           queries=$(cat query.txt)
           for query in $queries; do
             response=$(curl -s -X GET "http://localhost:5001/books$query")
-            echo "query: $query" >> log.txt
-            echo "response: $response" >> log.txt
+            echo "query: $query" >> response.txt
+            echo "response: $response" >> response.txt
           done
 
       - name: Upload query results
