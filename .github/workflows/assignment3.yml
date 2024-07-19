@@ -158,7 +158,7 @@ jobs:
       - name: Wait for Flask service to be ready
         run: |
           echo "Waiting for Flask service to be ready..."
-          while ! curl -s http://localhost:5001/health; do
+          while ! curl -s http://localhost:5001/books; do
             sleep 5
             echo "Waiting for Flask service..."
           done
