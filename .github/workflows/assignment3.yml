@@ -152,9 +152,20 @@ jobs:
       - name: Load Docker image
         run: docker load --input /tmp/books-service.tar
 
+      - name: Start services
+        run: docker-compose up -d
+
+      - name: Wait for Flask service to be ready
+        run: |
+          echo "Waiting for Flask service to be ready..."
+          while ! curl -s http://localhost:5001/health; do
+            sleep 5
+            echo "Waiting for Flask service..."
+          done
+          echo "Flask service is ready!"
+
       - name: Start services and run queries
         run: |
-          docker-compose up -d 
           curl -X POST http://localhost:5001/books -H "Content-Type: application/json" -d '{"title":"Adventures of Huckleberry Finn","ISBN":"9780520343641","genre":"Fiction"}'
           curl -X POST http://localhost:5001/books -H "Content-Type: application/json" -d '{"title":"The Best of Isaac Asimov","ISBN":"9780385050784","genre":"Science Fiction"}'
           curl -X POST http://localhost:5001/books -H "Content-Type: application/json" -d '{"title":"Fear No Evil","ISBN":"9780394558783","genre":"Biography"}'
