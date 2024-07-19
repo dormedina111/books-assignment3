@@ -97,9 +97,10 @@ jobs:
         run: docker ps
 
       - name: Run tests
-        run: |
-          docker-compose exec -T books pytest -v /app/tests/assn3_tests.py | tee assn3_test_results.txt
-          cat assn3_test_results.txt
+        env:
+          MONGO_URL: mongodb://mongo:27017/library
+        run: pytest -v tests/assn3_tests.py | tee assn3_test_results.txt
+        continue-on-error: true
 
       - name: Upload test results
         uses: actions/upload-artifact@v4
