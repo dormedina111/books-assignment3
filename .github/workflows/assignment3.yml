@@ -30,11 +30,13 @@ jobs:
           tags: books-service:latest
           outputs: type=docker,dest=/tmp/books-service.tar
       
-      - name: add log
-        run: if [ -f /tmp/books-service.tar ]; then
-               echo "image successfully built" >> log.txt
-             else
-               echo "image not able to be built" >> log.txt
+      - name: Add log
+        run: |
+          if [ -f /tmp/books-service.tar ]; then
+            echo "image successfully built" >> log.txt
+          else
+            echo "image not able to be built" >> log.txt
+          fi
 
       - name: Upload Docker image as artifact
         if: success()
