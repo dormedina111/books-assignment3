@@ -146,7 +146,7 @@ jobs:
           path: /tmp/books-service.tar
 
       - name: Load Docker image
-        run: docker load --input books-service/tmp/books-service.tar
+        run: docker load --input tmp/books-service.tar
 
       - name: Start services and run queries
         run: |
