@@ -66,6 +66,10 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v4
 
+      - name: Stop existing MongoDB container
+        run: |
+          docker ps -q --filter "ancestor=mongo" | grep -q . && docker stop $(docker ps -q --filter "ancestor=mongo") || echo "No existing MongoDB container to stop"
+
       - name: Download artifacts
         uses: actions/download-artifact@v4
 
