@@ -182,9 +182,17 @@ jobs:
           echo "" > response.txt
           while IFS= read -r query
           do
-            response=$(curl -s -X GET "http://localhost:5001/books$query")
-            echo "query: $query" >> response.txt
-            echo "response: $response" >> response.txt
+            response=$(curl -s -w "\nhttp_code:%{http_code}" -X GET "http://localhost:5001/books$query")
+            http_code=$(echo "$response" | grep "http_code:" | cut -d':' -f2)
+            json_response=$(echo "$response" | sed "/http_code:/d")
+
+            if [ "$http_code" -eq 200 ]; then
+              echo "query: $query" >> response.txt
+              echo "response: $json_response" >> response.txt
+            else
+              echo "query: $query" >> response.txt
+              echo "response: error $http_code" >> response.txt
+            fi
           done < query.txt
 
       - name: Upload query results
