@@ -217,3 +217,7 @@ jobs:
         with:
           name: query-results
           path: response.txt
+      
+      - name: Clean up Docker image artifact
+        if: always()
+        run: rm -f /tmp/books-service.tar
