@@ -220,4 +220,4 @@ jobs:
       
       - name: Clean up Docker image artifact
         if: always()
-        run: rm -f book-service
+        run: rm -f /book-service
