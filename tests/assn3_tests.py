@@ -40,7 +40,7 @@ def books_ids(create_books):
 def test_create_books(create_books):
     responses = create_books
     for response in responses:
-        assert response.status_code == 200
+        assert response.status_code == 201
     ids = [response.json()['id'] for response in responses]
     assert len(ids) == 3  
     assert len(ids) == len(set(ids)) 
