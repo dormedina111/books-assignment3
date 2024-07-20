@@ -31,6 +31,7 @@ jobs:
           outputs: type=docker,dest=/tmp/books-service.tar
       
       - name: Add log
+        if: always()
         run: |
           if [ -f /tmp/books-service.tar ]; then
             echo "image successfully built" >> log.txt
