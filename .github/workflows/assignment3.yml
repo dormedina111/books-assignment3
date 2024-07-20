@@ -22,7 +22,6 @@ jobs:
         uses: docker/setup-buildx-action@v3
 
       - name: Build Docker image
-        id: build_docker_image
         uses: docker/build-push-action@v5
         with:
           context: ./books
@@ -32,12 +31,14 @@ jobs:
           outputs: type=docker,dest=/tmp/books-service.tar
       
       - name: Add log
-        if: steps.build_docker_image.outcome == 'success'
-        run: echo "image successfully built" >> log.txt
-
-      - name: Log build failure
-        if: steps.build_docker_image.outcome != 'success'
-        run: echo "image not able to be built" >> log.txt
+        if: always()
+        run: |
+          if [ -f /tmp/books-service.tar ]; then
+            echo "image successfully built" >> log.txt
+          else
+            echo "image not able to be built" >> log.txt
+            exit 1
+          fi
 
       - name: Upload Docker image as artifact
         if: success()
