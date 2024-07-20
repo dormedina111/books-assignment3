@@ -25,7 +25,7 @@ jobs:
         uses: docker/build-push-action@v5
         with:
           context: ./books
-          file: ./books/Dockerfile
+          file: ./books/Dockerfil
           push: false
           tags: books-service:latest
           outputs: type=docker,dest=/tmp/books-service.tar
@@ -108,9 +108,9 @@ jobs:
       - name: Log test results
         run: |
           if grep -q "FAILED" assn3_test_results.txt; then
-            echo "Tests failed" >> log.txt
+            echo "tests failed" >> log.txt
           else
-            echo "Tests succeeded" >> log.txt
+            echo "tests succeeded" >> log.txt
           fi
 
       - name: Upload test results
