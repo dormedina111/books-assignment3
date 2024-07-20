@@ -184,7 +184,6 @@ jobs:
 
       - name: Run queries
         run: |
-          echo "" > response.txt
           echo "Starting query processing..."
           while IFS= read -r query
           do
