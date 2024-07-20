@@ -220,9 +220,6 @@ jobs:
       
       - name: Clean up Docker image artifact
         if: always()
-        run: rm -f books-service
-      
-      - name: Print list files currently available and directories
-        run: ls
+        run: rm -f books-service/books-service.tar
       
 
