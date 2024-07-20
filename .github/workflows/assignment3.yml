@@ -33,6 +33,10 @@ jobs:
       - name: Log image build result if failed
         if: failure()
         run: echo "image not able to be built" >> log.txt
+
+      - name: Log image build result if success
+        if: success()
+        run: echo "image successfully built" >> log.txt
          
 
       - name: Upload Docker image as artifact
