@@ -180,12 +180,12 @@ jobs:
       - name: Run queries
         run: |
           echo "" > response.txt
-          queries=$(cat query.txt)
-          for query in $queries; do
+          while IFS= read -r query
+          do
             response=$(curl -s -X GET "http://localhost:5001/books$query")
             echo "query: $query" >> response.txt
             echo "response: $response" >> response.txt
-          done
+          done < query.txt
 
       - name: Upload query results
         uses: actions/upload-artifact@v4
