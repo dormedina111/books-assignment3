@@ -168,7 +168,7 @@ jobs:
       - name: Print query file contents
         run: cat query.txt
 
-      - name: Run queries
+      - name: Add books queries
         run: |
           curl -X POST http://localhost:5001/books -H "Content-Type: application/json" -d '{"title":"Adventures of Huckleberry Finn","ISBN":"9780520343641","genre":"Fiction"}'
           curl -X POST http://localhost:5001/books -H "Content-Type: application/json" -d '{"title":"The Best of Isaac Asimov","ISBN":"9780385050784","genre":"Science Fiction"}'
@@ -176,6 +176,10 @@ jobs:
           curl -X POST http://localhost:5001/books -H "Content-Type: application/json" -d '{"title":"The Adventures of Tom Sawyer","ISBN":"9780195810400","genre":"Fiction"}'
           curl -X POST http://localhost:5001/books -H "Content-Type: application/json" -d '{"title":"I, Robot","ISBN":"9780553294385","genre":"Science Fiction"}'
           curl -X POST http://localhost:5001/books -H "Content-Type: application/json" -d '{"title":"Second Foundation","ISBN":"9780553293364","genre":"Science Fiction"}'
+
+      - name: Run queries
+        run: |
+          echo "" > response.txt
           queries=$(cat query.txt)
           for query in $queries; do
             response=$(curl -s -X GET "http://localhost:5001/books$query")
