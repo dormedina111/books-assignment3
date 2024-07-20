@@ -177,35 +177,35 @@ jobs:
           curl -X POST http://localhost:5001/books -H "Content-Type: application/json" -d '{"title":"I, Robot","ISBN":"9780553294385","genre":"Science Fiction"}'
           curl -X POST http://localhost:5001/books -H "Content-Type: application/json" -d '{"title":"Second Foundation","ISBN":"9780553293364","genre":"Science Fiction"}'
 
-       - name: Run queries
-         run: |
-            echo "" > response.txt
-            echo "Starting query processing..."
-            while IFS= read -r query
-            do
-              echo "Processing query line: $query"  # Debug statement
-              if [[ -z "$query" ]]; then
-                echo "Skipping empty line"
-                continue
-              fi
-              query=$(echo "$query" | tr -d '\r\n')  # Remove any newline or carriage return characters
-              echo "Running query: $query"
-              query_url="http://localhost:5001/books$query"
-              echo "Executing: curl -s -w \"\\nhttp_code:%{http_code}\" -X GET \"$query_url\""
-              response=$(curl -s -w "\nhttp_code:%{http_code}" -X GET "$query_url")
-              echo "Raw response: $response"
-              http_code=$(echo "$response" | grep "http_code:" | cut -d':' -f2)
-              json_response=$(echo "$response" | sed "/http_code:/d")
+      - name: Run queries
+        run: |
+          echo "" > response.txt
+          echo "Starting query processing..."
+          while IFS= read -r query
+          do
+            echo "Processing query line: $query"  # Debug statement
+            if [[ -z "$query" ]]; then
+              echo "Skipping empty line"
+              continue
+            fi
+            query=$(echo "$query" | tr -d '\r\n')  # Remove any newline or carriage return characters
+            echo "Running query: $query"
+            query_url="http://localhost:5001/books$query"
+            echo "Executing: curl -s -w \"\\nhttp_code:%{http_code}\" -X GET \"$query_url\""
+            response=$(curl -s -w "\nhttp_code:%{http_code}" -X GET "$query_url")
+            echo "Raw response: $response"
+            http_code=$(echo "$response" | grep "http_code:" | cut -d':' -f2)
+            json_response=$(echo "$response" | sed "/http_code:/d")
 
-              if [ "$http_code" -eq 200 ]; then
-                echo "query: $query" >> response.txt
-                echo "response: $json_response" >> response.txt
-              else
-                echo "query: $query" >> response.txt
-                echo "response: error $http_code" >> response.txt
-              fi
-              echo "Completed query: $query with response: $json_response"
-            done < query.txt 
+            if [ "$http_code" -eq 200 ]; then
+              echo "query: $query" >> response.txt
+              echo "response: $json_response" >> response.txt
+            else
+              echo "query: $query" >> response.txt
+              echo "response: error $http_code" >> response.txt
+            fi
+            echo "Completed query: $query with response: $json_response"
+          done < query.txt
           
       - name: Upload query results
         uses: actions/upload-artifact@v4
