@@ -177,6 +177,16 @@ jobs:
           curl -X POST http://localhost:5001/books -H "Content-Type: application/json" -d '{"title":"I, Robot","ISBN":"9780553294385","genre":"Science Fiction"}'
           curl -X POST http://localhost:5001/books -H "Content-Type: application/json" -d '{"title":"Second Foundation","ISBN":"9780553293364","genre":"Science Fiction"}'
 
+      - name: Test a Single Query
+        run: |
+          echo "Testing a single query:"
+          response=$(curl -s -w "\nhttp_code:%{http_code}" -X GET "http://localhost:5001/books?genre=Fiction")
+          echo "Raw response: $response"
+          http_code=$(echo "$response" | grep "http_code:" | cut -d':' -f2)
+          json_response=$(echo "$response" | sed "/http_code:/d")
+          echo "HTTP Code: $http_code"
+          echo "JSON Response: $json_response"
+
       - name: Run queries
         run: |
           echo "" > response.txt
