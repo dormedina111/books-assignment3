@@ -188,7 +188,7 @@ jobs:
           echo "Starting query processing..."
           while IFS= read -r query
           do
-            echo "Processing query line: $query"  # Debug statement
+            echo "Processing query line: $query"  
             if [[ -z "$query" ]]; then
               echo "Skipping empty line"
               continue
