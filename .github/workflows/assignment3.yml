@@ -165,6 +165,9 @@ jobs:
           done
           echo "Flask service is ready!"
 
+      - name: Print query file contents
+        run: cat query.txt
+
       - name: Run queries
         run: |
           curl -X POST http://localhost:5001/books -H "Content-Type: application/json" -d '{"title":"Adventures of Huckleberry Finn","ISBN":"9780520343641","genre":"Fiction"}'
