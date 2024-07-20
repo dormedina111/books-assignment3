@@ -177,6 +177,31 @@ jobs:
           curl -X POST http://localhost:5001/books -H "Content-Type: application/json" -d '{"title":"I, Robot","ISBN":"9780553294385","genre":"Science Fiction"}'
           curl -X POST http://localhost:5001/books -H "Content-Type: application/json" -d '{"title":"Second Foundation","ISBN":"9780553293364","genre":"Science Fiction"}'
 
+      - name: Print Environment Information
+        run: env
+
+      - name: Run queries
+        run: |
+          echo "" > response.txt
+          echo "Starting query processing..."
+          while IFS= read -r query
+          do
+            echo "Running query: $query"
+            response=$(curl -s -w "\nhttp_code:%{http_code}" -X GET "http://localhost:5001/books$query")
+            echo "Raw response: $response"
+            http_code=$(echo "$response" | grep "http_code:" | cut -d':' -f2)
+            json_response=$(echo "$response" | sed "/http_code:/d")
+          
+            if [ "$http_code" -eq 200 ]; then
+              echo "query: $query" >> response.txt
+              echo "response: $json_response" >> response.txt
+            else
+              echo "query: $query" >> response.txt
+              echo "response: error $http_code" >> response.txt
+            fi
+            echo "Completed query: $query with response: $json_response"
+          done < query.txt  
+        
       - name: Run queries
         run: |
           echo "" > response.txt
