@@ -217,15 +217,4 @@ jobs:
         with:
           name: query-results
           path: response.txt
-      
-      - name: Clean up books-service artifact
-        run: |
-          artifacts_url="https://api.github.com/repos/${{ github.repository }}/actions/artifacts"
-          artifacts=$(curl -H "Authorization: token ${{ secrets.GH_TOKEN }}" $artifacts_url)
-          artifact_id=$(echo $artifacts | jq -r '.artifacts[] | select(.name == "books-service") | .id')
-          if [ ! -z "$artifact_id" ]; then
-            delete_url="https://api.github.com/repos/${{ github.repository }}/actions/artifacts/$artifact_id"
-            curl -X DELETE -H "Authorization: token ${{ secrets.GH_TOKEN }}" $delete_url
-          fi
-      
 
