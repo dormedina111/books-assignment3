@@ -177,6 +177,11 @@ jobs:
           curl -X POST http://localhost:5001/books -H "Content-Type: application/json" -d '{"title":"I, Robot","ISBN":"9780553294385","genre":"Science Fiction"}'
           curl -X POST http://localhost:5001/books -H "Content-Type: application/json" -d '{"title":"Second Foundation","ISBN":"9780553293364","genre":"Science Fiction"}'
 
+      - name: Check all books after POST requests
+        run: |
+          echo "Checking all books after POST requests:"
+          curl -s -X GET http://localhost:5001/books | jq . 
+
       - name: Run queries
         run: |
           echo "" > response.txt
