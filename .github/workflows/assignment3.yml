@@ -218,9 +218,8 @@ jobs:
           name: query-results
           path: response.txt
       
-      - name: Delete books-service artifact
-        uses: actions/delete-artifact@v1
-        with:
-          name: books-service
+      - name: Clean up Docker image artifact
+        if: always()
+        run: rm -f /books-service/books-service.tar
       
 
