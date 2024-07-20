@@ -6,7 +6,7 @@ COPY . /app
 
 RUN pip install --no-cache-dir Flask requests pymongo
 
-EXPOS 5001
+EXPOSE 5001
 
 ENV FLASK_APP=app.py
 
