@@ -77,7 +77,7 @@ jobs:
         run: docker load --input books-service/books-service.tar
 
       - name: Set up Python
-        uses: actions/setup-python@v2
+        uses: actions/setup-python@v4
         with:
           python-version: '3.9'
 
