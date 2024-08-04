@@ -94,7 +94,7 @@ jobs:
 
       - name: Start services 
         run: |
-          docker-compose up -d && echo "Container up and running" >> log.txt || (echo "Container failed to run" >> log.txt && exit 1)
+          docker compose up -d && echo "Container up and running" >> log.txt || (echo "Container failed to run" >> log.txt && exit 1)
 
       - name: List running containers
         run: docker ps
@@ -154,7 +154,7 @@ jobs:
         run: docker load --input /tmp/books-service.tar
 
       - name: Start services
-        run: docker-compose up -d
+        run: docker compose up -d
 
       - name: Wait for Flask service to be ready
         run: |
