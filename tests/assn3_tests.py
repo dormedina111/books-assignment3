@@ -54,7 +54,7 @@ def test_get_book_by_id(books_ids):
 
 def test_get_all_books():
     response = requests.get(f"{base_url}/books")
-    assert response.status_code == 404
+    assert response.status_code == 200
     books_list = response.json()
     assert isinstance(books_list, list)
     assert len(books_list) == 3
