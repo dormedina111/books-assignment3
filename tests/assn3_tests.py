@@ -69,7 +69,7 @@ def test_post_books():
         res = requests.post(BASE_URL, json=book)
         assert res.status_code == 201
         res_data = res.json()
-        assert "ID" in res_data
+        assert "id" in res_data
         books_data.append(res_data)
         books_data_tuples = [frozenset(book.items()) for book in books_data]
     assert len(set(books_data_tuples)) == 3
