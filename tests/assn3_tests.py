@@ -82,7 +82,7 @@ def test_get_query():
 
 
 def test_delete_book():
-    res = requests.delete(f"{BASE_URL}/{books_data[0]['ID']}")
+    res = requests.delete(f"{BASE_URL}/{books_data[0]['id']}")
     assert res.status_code == 200
 
 
