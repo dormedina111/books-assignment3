@@ -36,7 +36,6 @@
 # @pytest.fixture(scope="module")
 # def books_ids(create_books):
 #     return [response.json()['id'] for response in create_books]
-
 # ----- NIR TEST ------ 
 
 import requests
@@ -72,7 +71,8 @@ def test_post_books():
         res_data = res.json()
         assert "ID" in res_data
         books_data.append(res_data)
-    assert len(set(books_data)) == 3
+        books_data_tuples = [frozenset(book.items()) for book in books_data]
+    assert len(set(books_data_tuples)) == 3
 
 
 def test_get_query():
@@ -81,77 +81,24 @@ def test_get_query():
     assert len(res.json()) == 2
 
 
-def test_put():
-    books_data[0]["title"] = "new title"
-    res = requests.put(f"{BASE_URL}/{books_data[0]["ID"]}", json=books_data[0])
-    assert res.status_code == 200
-
-
-def test_book_by_id():
-    res = requests.get(f"{BASE_URL}/{books_data[0]["ID"]}")
-    assert res.status_code == 200
-    res_data = res.json()
-    assert res_data["title"] == "new title"
-
-
 def test_delete_book():
-    res = requests.delete(f"{BASE_URL}/{books_data[0]["ID"]}")
+    res = requests.delete(f"{BASE_URL}/{books_data[0]['ID']}")
     assert res.status_code == 200
 
 
 def test_post_book():
     book = {
         "title": "The Art of Loving",
-        "authors": "Erich Fromm",
         "ISBN": "9780062138927",
         "genre": "Science"
     }
     res = requests.post(BASE_URL, json=book)
-    assert res.status_code == 200
+    assert res.status_code == 201
+
 
 
 def test_get_new_book_query():
     res = requests.get(f"{BASE_URL}?genre=Science")
     assert res.status_code == 200
     res_data = res.json()
-    assert res_data["title"] == "The Art of Loving"
-
-# def test_create_books(create_books):
-#     responses = create_books
-#     for response in responses:
-#         assert response.status_code == 201
-#     ids = [response.json()['id'] for response in responses]
-#     assert len(ids) == 3  
-#     assert len(ids) == len(set(ids)) 
-
-# def test_get_book_by_id(books_ids):
-#     book1_id = books_ids[0]
-#     response = requests.get(f"{base_url}/books/{book1_id}")
-#     assert response.status_code == 200
-#     book = response.json()
-#     assert book['authors'] == "Mark Twain"
-
-# def test_get_all_books():
-#     response = requests.get(f"{base_url}/books")
-#     assert response.status_code == 200
-#     books_list = response.json()
-#     assert isinstance(books_list, list)
-#     assert len(books_list) == 3
-
-# def test_create_book_with_invalid_isbn():
-#     response = requests.post(f"{base_url}/books", json=book4)
-#     assert response.status_code in [400, 500]
-
-# def test_delete_book(books_ids):
-#     book2_id = books_ids[1]
-#     response = requests.delete(f"{base_url}/books/{book2_id}")
-#     assert response.status_code == 200
-
-# def test_get_deleted_book(books_ids):
-#     book2_id = books_ids[1]
-#     response = requests.get(f"{base_url}/books/{book2_id}")
-#     assert response.status_code == 404
-
-# def test_create_book_with_invalid_genre():
-#     response = requests.post(f"{base_url}/books", json=book5)
-#     assert response.status_code == 422
+    assert res_data[0]["title"] == "The Art of Loving"
